@@ -1,5 +1,6 @@
 package com.hmall.api.client;
 
+import com.hmall.api.client.fallback.ItemClientFallback;
 import com.hmall.api.dto.ItemDTO;
 import com.hmall.api.dto.OrderDetailDTO;
 import io.swagger.annotations.ApiOperation;
@@ -17,7 +18,7 @@ import java.util.List;
  * @Date: 2025/8/18 14:12
  * @Description: TODO
  **/
-@FeignClient("item-service")
+@FeignClient(value = "item-service", fallbackFactory = ItemClientFallback.class)
 public interface ItemClient {
 
     @GetMapping("/items")
