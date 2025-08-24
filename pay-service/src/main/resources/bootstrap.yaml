@@ -1,6 +1,6 @@
 spring:
   application:
-    name: trade-service # 服务名称
+    name: pay-service # 服务名称
   profiles:
     active: dev
   cloud:
@@ -11,6 +11,5 @@ spring:
         shared-configs: # 共享配置
           - dataId: shared-jdbc.yaml # 共享mybatis配置
           - dataId: shared-log.yaml # 共享日志配置
-          - dataId: shared-swagger.yaml # 共享日志配置
-          - dataId: shared-seata.yaml # 共享分布式配置
+          - dataId: shared-swagger.yaml # 共享API配置
           - data-id: shared-mq.yaml # 共享消息队列配置
