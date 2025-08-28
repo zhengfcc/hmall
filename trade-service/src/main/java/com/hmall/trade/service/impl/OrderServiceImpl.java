@@ -6,6 +6,7 @@ import com.hmall.api.dto.ItemDTO;
 import com.hmall.api.dto.OrderDetailDTO;
 import com.hmall.common.exception.BadRequestException;
 import com.hmall.common.utils.UserContext;
+import com.hmall.trade.constants.MQConstants;
 import com.hmall.trade.domain.dto.OrderFormDTO;
 import com.hmall.trade.domain.po.Order;
 import com.hmall.trade.domain.po.OrderDetail;
@@ -86,6 +87,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         } catch (AmqpException e) {
             log.error("清理购物车商品失败");
         }
+
+        // 5.发送延迟消息，检测订单支付状态
+        rabbitTemplate.convertAndSend(
+                MQConstants.DELAY_EXCHANGE_NAME,
+                MQConstants.DELAY_ORDER_KEY,
+                order.getId(),
+                message -> {
+                    message.getMessageProperties().setDelay(10000);
+                    return message;
+                }
+        );
         return order.getId();
     }
 
@@ -107,10 +119,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
     @Override
     public void markOrderPaySuccess(Long orderId) {
-        Order order = new Order();
-        order.setId(orderId);
-        order.setStatus(2);
-        order.setPayTime(LocalDateTime.now());
-        updateById(order);
+        // UPDATE `order` SET status = ? , pay_time = ? WHERE id = ? AND status = 1
+        lambdaUpdate()
+                .set(Order::getStatus, 2)
+                .set(Order::getPayTime, LocalDateTime.now())
+                .eq(Order::getId, orderId)
+                .eq(Order::getStatus, 1)
+                .update();
+    }
+
+    @Override
+    public void cancelOrder(Long orderId) {
+        // TODO
     }
 }

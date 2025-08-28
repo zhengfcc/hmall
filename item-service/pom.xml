@@ -61,6 +61,11 @@
             <version>1.6.1</version>
             <!-- 推荐使用 1.6.x 或更高版本 -->
         </dependency>
+        <!--elasticsearch-->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>
